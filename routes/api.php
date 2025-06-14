@@ -30,9 +30,10 @@ Route::prefix('books')->group(function () {
 Route::prefix('authors')->group(function () {
     Route::get('/', [AuthorController::class, 'index'])->name("/allAuthors");
     Route::get('/{id}', [AuthorController::class, 'show']);
-    Route::post('/create', [AuthorController::class, 'createAuthor']);
+    // Route::post('/create', [AuthorController::class, 'createAuthor']);
     Route::put('/edit/{id}', [AuthorController::class, 'edit']);
     Route::delete('/delete/{id}', [AuthorController::class, 'delete']);
+    Route::post('/create', [AuthorController::class, 'createAuthors']);
 });
 
 //Route User
