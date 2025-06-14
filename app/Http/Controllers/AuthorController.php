@@ -38,17 +38,18 @@ class AuthorController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function createAuthors(Request $request)
+    public function createUsers(Request $request)
     {
         return response()->json([
-            "message" => "Author created successfully",
+            "message" => "User created successfully",
             "data" => [
                 "name" => $request->name,
-                "bio" => $request->bio,
-                "nationality" => $request->nationality
+                "email" => $request->email,
+                "phone" => $request->phone
             ]
         ], 201);
     }
+
 
 
     /**
