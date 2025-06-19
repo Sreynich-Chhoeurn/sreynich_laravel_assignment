@@ -18,13 +18,12 @@ use App\Http\Controllers\UserController;
 */
 
 // Route Book
-Route::prefix('books')->group(function () {
-    Route::get('/', [BookController::class, 'index'])->name("/allBooks");
-    Route::get('/book/{id}', [BookController::class, 'show']);
-    Route::post('/create', [BookController::class, 'createBook']);
-    Route::put('/edit/{id}', [BookController::class, 'edit']);
-    Route::delete('/delete/{id}', [BookController::class, 'delete']);
-});
+//Book API Routes
+Route::get('/books', [BookController::class, 'index']);
+Route::get('/books/{id}', [BookController::class, 'show']);
+Route::post('/books', [BookController::class, 'create']);
+Route::put('/books/{id}', [BookController::class, 'edit']);
+Route::delete('/books/{id}', [BookController::class, 'delete']);
 
 //Route Author
 Route::prefix('authors')->group(function () {

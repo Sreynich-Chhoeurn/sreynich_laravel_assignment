@@ -4,131 +4,61 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
+use App\Models\Book;
+
 class BookController extends Controller
 {
-    public $books = [
-                        [
-                    "id" => "1",
-                    "title" => "1984",
-                    "authorId" => "A1",
-                    "isbn" => "9780451524935",
-                    "publicationYear" => 1949,
-                    "genre" => "Dystopian",
-                    "availableCopies" => 5
-                ],
-                [
-                    "id" => "2",
-                    "title" => "To Kill a Mockingbird",
-                    "authorId" => "A2",
-                    "isbn" => "9780061120084",
-                    "publicationYear" => 1960,
-                    "genre" => "Fiction",
-                    "availableCopies" => 3
-                ]
-    ];
-    /**
-     * Display a listing of the resource.
-     */
-
-    // GET /api/books - Get all books
+    // Get all books
     public function index()
     {
-
-        return response()->json([
-            'message' => 'List of books',
-            'data' => $this->books
-        ], 200);
-
+        $books = Book::all();
+        return response()->json(['message' => 'Books fetched successfully', 'data' => $books], 200);
     }
 
-    // GET: /api/books/{id}
-    public function find($id)
-    {
-        foreach ($this->books as $book) {
-            if ($book['id'] == $id) {
-                return $book;
-            }
-        }
-        return null;
-    }
-
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function createBook(Request $request) {
-        return response() -> json([
-            "message" => "Successful",
-            "data" => [
-                'title' => $request->title,
-                "author" => $request->author,
-                "isbn" => $request->isbn,
-                "publicationYear" => $request->publicationYear,
-                "genre" => $request->genre,
-                "availableCopies" => $request->availableCopies
-            ]
-        ], 201);
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
+    // Get book by ID
     public function show($id)
     {
-        $book = $this->find($id);
-    
+        $book = Book::find($id);
         if (!$book) {
             return response()->json(['message' => 'Book not found'], 404);
         }
-    
-        return response()->json([
-            'message' => 'Book found',
-            'data' => $book
-        ], 200);
+        return response()->json(['message' => 'Book fetched successfully', 'data' => $book], 200);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Request $request, int $id){
-        return response()-> json([
-            "id" => $id,
-            "data" => [
-                "title" => $request->title,
-                "author" => $request->author,
-                "ibsn" => $request->isbn,
-                "publicationYear" => $request->publicationYear,
-                "genre" => $request->genre,
-                "availableCopies" => $request->availableCopies
-            ]
-            ], 200);
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-        public function update(Request $request, $id)
+    // Create a new book
+    public function create(Request $request)
     {
-        //
+        $request->validate([
+            'title' => 'required',
+            'author' => 'required',
+            'year' => 'required|integer',
+        ]);
+
+        $book = Book::create($request->all());
+        return response()->json(['message' => 'Book created successfully', 'data' => $book], 201);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-        public function delete(int $id){
-        return response()->json([
-            "message" => "Book with id $id deleted successfully",
-            "data" => [
-                "id" => $id
-            ]
-        ], 200);
+    // Update book
+    public function edit(Request $request, $id)
+    {
+        $book = Book::find($id);
+        if (!$book) {
+            return response()->json(['message' => 'Book not found'], 404);
+        }
+
+        $book->update($request->all());
+        return response()->json(['message' => 'Book updated successfully', 'data' => $book], 200);
+    }
+
+    // Delete book
+    public function delete($id)
+    {
+        $book = Book::find($id);
+        if (!$book) {
+            return response()->json(['message' => 'Book not found'], 404);
+        }
+
+        $book->delete();
+        return response()->json(['message' => 'Book deleted successfully'], 200);
     }
 }
