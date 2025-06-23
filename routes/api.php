@@ -45,11 +45,11 @@ Route::prefix('authors')->group(function () {
 // User Routes
 // ----------------------------
 Route::prefix('users')->group(function () {
-    Route::get('/', [UserController::class, 'index'])->name('allUsers');
-    Route::get('/user/{id}', [UserController::class, 'show']);           
-    Route::post('/create', [UserController::class, 'createUsers']);     
-    Route::put('/edit/{id}', [UserController::class, 'edit']);          
-    Route::delete('/delete/{id}', [UserController::class, 'delete']);   
+    Route::get('/', [UserController::class, 'index']);
+    Route::post('/create', [UserController::class, 'create']);
+    Route::get('/user/{id}', [UserController::class, 'show']);
+    Route::put('/edit/{id}', [UserController::class, 'edit']);
+    Route::delete('/delete/{id}', [UserController::class, 'delete']);
 });
 
 // ----------------------------

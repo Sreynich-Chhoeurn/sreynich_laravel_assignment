@@ -3,110 +3,102 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\User; // Import your User model
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
+use App\Http\Requests\StoreUserRequest; // Import your custom request for validation
 
 class UserController extends Controller
 {
-    public $users = [
-        ['id' => '1', 'name' => 'Alice Smith', 'email' => 'alice@example.com', 'phone' => '012345678'],
-        ['id' => '2', 'name' => 'Bob Johnson', 'email' => 'bob@example.com', 'phone' => '098765432'],
-        ['id' => '3', 'name' => 'Charlie Lee', 'email' => 'charlie@example.com', 'phone' => '011223344'],
-    ];
-
-    
-    /**
-     * Display a listing of the resource.
-     */
-
+    // List all users
     public function index()
     {
-        //GET /api/users
+        $users = User::all();
         return response()->json([
             'message' => 'All users retrieved',
-            'data' => $this->users
+            'data' => $users
         ], 200);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    
-    public function createUser(Request $request)
-    {
-        // POST /api/users
-        return response()->json([
-            "message" => "User created successfully",
-            "data" => [
-                "name" => $request->name,
-                "email" => $request->email,
-                "phone" => $request->phone
-            ]
-        ], 201);
-    }
+    // Create a new user
+public function create(StoreUserRequest $request)
+{
+    $user = User::create($request->validated());
+    return response()->json([
+        'message' => 'User created successfully',
+        'data' => $user
+    ], 201);
+}
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+
+    // Show user by ID
+    public function show($id)
     {
-        // GET /api/users/{id}
-        foreach ($this->users as $user) {
-            if ($user['id'] == $id) {
-                return response()->json([
-                    'message' => 'User found',
-                    'data' => $user
-                ], 200);
-            }
+        $user = User::find($id);
+        if (!$user) {
+            return response()->json(['message' => 'User not found'], 404);
         }
 
         return response()->json([
-            'message' => 'User not found',
-        ], 404);
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-  
-    public function edit(Request $request, int $id)
-    {
-          // PUT /api/users/{id}
-        return response()->json([
-            "id" => $id,
-            "data" => [
-                "name" => $request->name,
-                "email" => $request->email,
-                "phone" => $request->phone
-            ]
+            'message' => 'User found',
+            'data' => $user
         ], 200);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    // Update user by ID
+    public function edit(Request $request, $id)
     {
-        //
+        $user = User::find($id);
+        if (!$user) {
+            return response()->json(['message' => 'User not found'], 404);
+        }
+
+        $request->validate([
+            'name' => 'sometimes|required|string|min:2|max:255',
+            'email' => [
+                'sometimes',
+                'required',
+                'email',
+                Rule::unique('users')->ignore($user->id),
+            ],
+            'password' => 'sometimes|nullable|string|min:6',
+            'phone' => 'sometimes|nullable|string|min:6|max:15',
+        ]);
+
+        if ($request->has('name')) {
+            $user->name = $request->name;
+        }
+        if ($request->has('email')) {
+            $user->email = $request->email;
+        }
+        if ($request->has('password') && $request->password !== null) {
+            $user->password = Hash::make($request->password);
+        }
+        if ($request->has('phone')) {
+            $user->phone = $request->phone;
+        }
+
+        $user->save();
+
+        return response()->json([
+            'message' => 'User updated successfully',
+            'data' => $user
+        ], 200);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    // DELETE /api/users/{id}
-    public function delete(int $id)
+    // Delete user by ID
+    public function delete($id)
     {
+        $user = User::find($id);
+        if (!$user) {
+            return response()->json(['message' => 'User not found'], 404);
+        }
+
+        $user->delete();
+
         return response()->json([
-            "message" => "User with id $id deleted successfully",
-            "data" => [
-                "id" => $id
-            ]
+            'message' => "User with id $id deleted successfully"
         ], 200);
     }
 }
