@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 
 use App\Models\Book;
 
+use App\Http\Requests\StoreBookRequest; // Import the request class for validation
+
 class BookController extends Controller
 {
     // Get all books
@@ -26,29 +28,34 @@ class BookController extends Controller
     }
 
     // Create a new book
-    public function create(Request $request)
+    public function create(StoreBookRequest $request)
     {
-        $request->validate([
-            'title' => 'required',
-            'author' => 'required',
-            'year' => 'required|integer',
-        ]);
-
-        $book = Book::create($request->all());
-        return response()->json(['message' => 'Book created successfully', 'data' => $book], 201);
+        $validated = $request->validated();
+        $book = Book::create($validated);
+    
+        return response()->json([
+            'message' => 'Book created successfully',
+            'data' => $book
+        ], 201);
     }
-
+    
     // Update book
-    public function edit(Request $request, $id)
+    public function edit(StoreBookRequest $request, $id)
     {
         $book = Book::find($id);
         if (!$book) {
             return response()->json(['message' => 'Book not found'], 404);
         }
-
-        $book->update($request->all());
-        return response()->json(['message' => 'Book updated successfully', 'data' => $book], 200);
+    
+        $validated = $request->validated();
+        $book->update($validated);
+    
+        return response()->json([
+            'message' => 'Book updated successfully',
+            'data' => $book
+        ], 200);
     }
+
 
     // Delete book
     public function delete($id)

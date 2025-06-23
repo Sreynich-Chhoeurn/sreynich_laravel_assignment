@@ -17,33 +17,42 @@ use App\Http\Controllers\UserController;
 |
 */
 
-// Route Book
-//Book API Routes
-Route::get('/books', [BookController::class, 'index']);
-Route::get('/books/{id}', [BookController::class, 'show']);
-Route::post('/books', [BookController::class, 'create']);
-Route::put('/books/{id}', [BookController::class, 'edit']);
-Route::delete('/books/{id}', [BookController::class, 'delete']);
 
-//Route Author
+// ----------------------------
+// Book Routes
+// ----------------------------
+Route::prefix('books')->group(function () {
+    Route::get('/', [BookController::class, 'index']);                
+    Route::get('/{id}', [BookController::class, 'show']);             
+    Route::post('/create', [BookController::class, 'create']);        
+    Route::put('/edit/{id}', [BookController::class, 'edit']);       
+    Route::delete('/delete/{id}', [BookController::class, 'delete']); 
+});
+
+// ----------------------------
+// Author Routes
+// ----------------------------
 Route::prefix('authors')->group(function () {
-    Route::get('/', [AuthorController::class, 'index'])->name("/allAuthors");
-    Route::get('/{id}', [AuthorController::class, 'show']);
-    // Route::post('/create', [AuthorController::class, 'createAuthor']);
-    Route::put('/edit/{id}', [AuthorController::class, 'edit']);
-    Route::delete('/delete/{id}', [AuthorController::class, 'delete']);
-    Route::post('/create', [AuthorController::class, 'createAuthors']);
+    Route::get('/', [AuthorController::class, 'index'])->name('allAuthors'); 
+    Route::get('/{id}', [AuthorController::class, 'show']);                 
+    Route::put('/edit/{id}', [AuthorController::class, 'edit']);            
+    Route::delete('/delete/{id}', [AuthorController::class, 'delete']);     
 });
 
-//Route User
+// ----------------------------
+// User Routes
+// ----------------------------
 Route::prefix('users')->group(function () {
-    Route::get('/', [UserController::class, 'index'])->name("/allUsers");
-    Route::get('/user/{id}', [UserController::class, 'show']);
-    Route::post('/create', [UserController::class, 'createUsers']);
-    Route::put('/edit/{id}', [UserController::class, 'edit']);
-    Route::delete('/delete/{id}', [UserController::class, 'delete']);
+    Route::get('/', [UserController::class, 'index'])->name('allUsers');
+    Route::get('/user/{id}', [UserController::class, 'show']);           
+    Route::post('/create', [UserController::class, 'createUsers']);     
+    Route::put('/edit/{id}', [UserController::class, 'edit']);          
+    Route::delete('/delete/{id}', [UserController::class, 'delete']);   
 });
 
+// ----------------------------
+// Authenticated User Route
+// ----------------------------
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
