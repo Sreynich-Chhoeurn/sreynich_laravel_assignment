@@ -3,116 +3,83 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Author;
+use App\Http\Requests\StoreAuthorRequest;
 
 class AuthorController extends Controller
 {
-    public $authors = [
-        ['id' => '1', 'name' => 'Jane Austen', 'bio' => 'English novelist.', 'nationality' => 'British'],
-        ['id' => '2', 'name' => 'Mark Twain', 'bio' => 'American writer.', 'nationality' => 'American'],
-        ['id' => '3', 'name' => 'Nguyen Du', 'bio' => 'Vietnamese poet.', 'nationality' => 'Vietnamese'],
-    ];
-
-    /**
-     * Display a listing of the resource.
-     */
+    // 1. List all authors
     public function index()
     {
-        // GET /api/authors
+        $authors = Author::all();
         return response()->json([
             'message' => 'All authors retrieved',
-            'data' => $this->authors
+            'data' => $authors
         ], 200);
     }
 
-    // GET: /api/authors/{id}
-    public function find($id)
+    // Create new author (POST /authors/create)
+    public function create(StoreAuthorRequest $request)
     {
-        foreach ($this->authors as $author) {
-            if ($author['id'] == $id) {
-                return $author;
-            }
-        }
-        return null;
-    }
+        $author = Author::create($request->validated());
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function createUsers(Request $request)
-    {
         return response()->json([
-            "message" => "User created successfully",
-            "data" => [
-                "name" => $request->name,
-                "email" => $request->email,
-                "phone" => $request->phone
-            ]
+            'message' => 'Author created successfully',
+            'data' => $author
         ], 201);
     }
 
-
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    // Show single author by id
+    public function show($id)
     {
-        //
-    }
+        $author = Author::find($id);
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        foreach ($this->authors as $author) {
-            if ($author['id'] == $id) {
-                return response()->json([
-                    'message' => 'Author found',
-                    'data' => $author
-                ], 200);
-            }
+        if (!$author) {
+            return response()->json(['message' => 'Author not found'], 404);
         }
 
-    return response()->json([
-        'message' => 'Author not found',
-       
-    ], 404);
-}
-
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Request $request, int $id)
-    {
         return response()->json([
-            "id" => $id,
-            "data" => [
-                "name" => $request->name,
-                "bio" => $request->bio,
-                "nationality" => $request->nationality
-            ]
+            'message' => 'Author found',
+            'data' => $author
         ], 200);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    // Update author (PUT /authors/edit/{id})
+    public function edit(Request $request, $id)
     {
-        //
+        $request->validate([
+            'name' => 'sometimes|required|string|min:2|max:255',
+            'bio' => 'nullable|string|max:1000',
+            'nationality' => 'sometimes|required|string|max:255',
+        ]);
+
+        $author = Author::find($id);
+
+        if (!$author) {
+            return response()->json(['message' => 'Author not found'], 404);
+        }
+
+        $author->update($request->all());
+
+        return response()->json([
+            'message' => 'Author updated successfully',
+            'data' => $author
+        ], 200);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function delete(int $id){
+    // Delete author (DELETE /authors/delete/{id})
+    public function delete($id)
+    {
+        $author = Author::find($id);
+
+        if (!$author) {
+            return response()->json(['message' => 'Author not found'], 404);
+        }
+
+        $author->delete();
+
         return response()->json([
-            "message" => "Author with id $id deleted successfully",
-            "data" => [
-                "id" => $id
-            ]
+            'message' => "Author with ID $id deleted successfully"
         ], 200);
     }
 }

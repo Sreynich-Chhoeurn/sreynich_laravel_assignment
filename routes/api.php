@@ -33,11 +33,13 @@ Route::prefix('books')->group(function () {
 // Author Routes
 // ----------------------------
 Route::prefix('authors')->group(function () {
-    Route::get('/', [AuthorController::class, 'index'])->name('allAuthors'); 
-    Route::get('/{id}', [AuthorController::class, 'show']);                 
-    Route::put('/edit/{id}', [AuthorController::class, 'edit']);            
-    Route::delete('/delete/{id}', [AuthorController::class, 'delete']);     
+    Route::get('/', [AuthorController::class, 'index'])->name('allAuthors');
+    Route::post('/create', [AuthorController::class, 'create']);
+    Route::get('/{id}', [AuthorController::class, 'show']);
+    Route::put('/edit/{id}', [AuthorController::class, 'edit']);
+    Route::delete('/delete/{id}', [AuthorController::class, 'delete']);
 });
+
 
 // ----------------------------
 // User Routes
