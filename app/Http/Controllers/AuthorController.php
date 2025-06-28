@@ -30,18 +30,32 @@ class AuthorController extends Controller
     }
 
     // Show single author by id
+    // public function show($id)
+    // {
+    //     $author = Author::find($id);
+
+    //     if (!$author) {
+    //         return response()->json(['message' => 'Author not found'], 404);
+    //     }
+
+    //     return response()->json([
+    //         'message' => 'Author found',
+    //         'data' => $author
+    //     ], 200);
+    // }
+
     public function show($id)
     {
-        $author = Author::find($id);
-
-        if (!$author) {
-            return response()->json(['message' => 'Author not found'], 404);
-        }
+        // Load the author and their books
+        $author = Author::with('books')->findOrFail($id);
 
         return response()->json([
-            'message' => 'Author found',
-            'data' => $author
-        ], 200);
+            'id' => $author->id,
+            'name' => $author->name,
+            'bio' => $author->bio,
+            'nationality' => $author->nationality,
+            'books' => $author->books->pluck('title'), // ✅ get book titles
+        ]);
     }
 
     // Update author (PUT /authors/edit/{id})
